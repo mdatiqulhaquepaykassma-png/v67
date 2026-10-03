@@ -897,6 +897,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenWallet={() => setIsWalletOpen(true)}
+        onOpenBetHistory={() => setIsBetHistoryOpen(true)}
         onOpenInstallApp={handleTriggerInstallApp}
         isStandalone={isStandalone}
         isInstalled={isInstalled}
