@@ -50,6 +50,7 @@ import { useTableParallax } from "../utils/useTableParallax";
 import { sound } from "../utils/audio";
 import { haptics } from "../utils/haptics";
 import { useActiveCurrency, formatCurrency } from "../utils/currency";
+import { usePerformanceMode } from "../utils/performance";
 import { LiveChat } from "./LiveChat";
 import { LiveBetFeed } from "./LiveBetFeed";
 import { LiveAction } from "./LiveAction";
@@ -127,6 +128,7 @@ export const GameTable = React.memo<GameTableProps>(({
   onNavigateToP2P,
 }) => {
   const soundManager = useSoundManager();
+  const perf = usePerformanceMode();
 
   // Table Limits & Chip Configuration per Table
   const tableConfigs: Record<
@@ -2926,6 +2928,40 @@ export const GameTable = React.memo<GameTableProps>(({
 
             </div>
 
+         </div>
+
+         {/* GPU Hardware-Accelerated Parabolic Flying Chips Layer */}
+         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+           {flyingChips.map((chip) => {
+             const isDragon = chip.side.includes("DRAGON");
+             return (
+               <div
+                 key={chip.id}
+                 className="absolute animate-chip-fly flex items-center justify-center pointer-events-none"
+                 style={{
+                   left: `${chip.targetX}%`,
+                   top: `${chip.targetY}%`,
+                   transform: "translate(-50%, -50%)",
+                 }}
+               >
+                 <div
+                   className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full border-2 border-dashed flex items-center justify-center font-mono font-black text-[9px] sm:text-[10px] shadow-2xl ${
+                     isDragon
+                       ? "bg-red-600 border-amber-300 text-white shadow-[0_0_15px_rgba(239,68,68,0.9)]"
+                       : "bg-amber-500 border-yellow-200 text-neutral-950 shadow-[0_0_15px_rgba(245,158,11,0.9)]"
+                   }`}
+                 >
+                   ৳{chip.amount}
+                 </div>
+                 {/* Landing Impact Shockwave */}
+                 <div
+                   className={`absolute inset-0 rounded-full border-2 animate-impact-ripple pointer-events-none ${
+                     isDragon ? "border-red-500" : "border-amber-400"
+                   }`}
+                 />
+               </div>
+             );
+           })}
          </div>
 
       </div>

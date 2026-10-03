@@ -2,6 +2,7 @@ import React, { useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Flame, Crown, Zap } from "lucide-react";
 import { formatCurrency, useActiveCurrency } from "../utils/currency";
+import { usePerformanceMode } from "../utils/performance";
 
 export interface WinningSideConfettiProps {
   side: "DRAGON" | "TIGER" | "TIE" | null;
@@ -38,6 +39,7 @@ export const WinningSideConfetti = React.memo<WinningSideConfettiProps>(({
   onComplete,
 }) => {
   const activeCurrency = useActiveCurrency();
+  const perf = usePerformanceMode();
 
   // Color schemes strictly customized for each winning side
   const dragonPalette = [
@@ -81,7 +83,7 @@ export const WinningSideConfetti = React.memo<WinningSideConfettiProps>(({
         ? tigerPalette
         : tiePalette;
 
-    const count = 75; // 75 high-fidelity particles for rich density
+    const count = perf.maxParticles; // Dynamic adaptive count (e.g. 12 on low-end, 36 on desktop)
     const items: ParticleSpec[] = [];
 
     const types: ParticleSpec["type"][] = [
@@ -106,8 +108,8 @@ export const WinningSideConfetti = React.memo<WinningSideConfettiProps>(({
       const spreadAngle = (Math.PI * 0.7) * (Math.random() - 0.5); // spread cone
       const velocity = 140 + Math.random() * 220;
       const burstX = Math.sin(spreadAngle) * (velocity * 0.95);
-      const peakY = -120 - Math.random() * 240;
-      const finalY = 320 + Math.random() * 280;
+      const peakY = -100 - Math.random() * 200;
+      const finalY = 280 + Math.random() * 240;
 
       items.push({
         id: i,
@@ -119,16 +121,16 @@ export const WinningSideConfetti = React.memo<WinningSideConfettiProps>(({
         peakY,
         finalY,
         scale: 0.6 + Math.random() * 0.65,
-        rotationZ: (Math.random() - 0.5) * 1080,
-        rotationX: Math.random() * 720,
-        rotationY: Math.random() * 720,
-        duration: 2.3 + Math.random() * 1.3,
-        delay: Math.random() * 0.28,
+        rotationZ: perf.isLowEnd ? 0 : (Math.random() - 0.5) * 720,
+        rotationX: perf.isLowEnd ? 0 : Math.random() * 360,
+        rotationY: perf.isLowEnd ? 0 : Math.random() * 360,
+        duration: 1.8 + Math.random() * 0.8,
+        delay: Math.random() * 0.18,
       });
     }
 
     return items;
-  }, [side, activationKey]);
+  }, [side, activationKey, perf.maxParticles, perf.isLowEnd]);
 
   // Auto-dismiss cleanup
   useEffect(() => {

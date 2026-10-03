@@ -2973,13 +2973,13 @@ app.post("/api/rooms/create", requireUser, (req, res) => {
   }
 
   let calculatedAcceptorAmount = 0;
-  if (clientAcceptorAmount !== undefined && !isNaN(Number(clientAcceptorAmount)) && Number(clientAcceptorAmount) >= 10) {
+  if (clientAcceptorAmount !== undefined && !isNaN(Number(clientAcceptorAmount)) && Number(clientAcceptorAmount) >= 1) {
     calculatedAcceptorAmount = Math.round(Number(clientAcceptorAmount));
   } else {
     let numOdds = Number(odds);
     if (isNaN(numOdds) || numOdds < 1.05) numOdds = 2.0;
     if (numOdds > 50.0) numOdds = 50.0;
-    calculatedAcceptorAmount = Math.max(10, Math.round(numAmount * (numOdds - 1)));
+    calculatedAcceptorAmount = Math.max(1, Math.round(numAmount * (numOdds - 1)));
   }
 
   const totalPot = numAmount + calculatedAcceptorAmount;
@@ -3118,9 +3118,9 @@ app.post("/api/rooms/accept", requireUser, (req, res) => {
     return res.status(400).json({ error: "You cannot accept your own challenge. Use 'Cancel & Refund' to cancel it." });
   }
 
-  let requiredAcceptorStake = room.acceptorAmount || Math.round(room.amount * ((room.odds || 2.0) - 1));
+  let requiredAcceptorStake = Math.max(1, room.acceptorAmount || Math.round(room.amount * ((room.odds || 2.0) - 1)));
   if (customAcceptorStake !== undefined && !isNaN(Number(customAcceptorStake))) {
-    const customStakeNum = Number(customAcceptorStake);
+    const customStakeNum = Math.max(1, Number(customAcceptorStake));
     if (room.minStake !== undefined && customStakeNum < room.minStake) {
       return res.status(400).json({ error: `🚫 বাজির পরিমাণ রুম ক্রিয়েটর কর্তৃক নির্ধারিত সর্বনিম্ন বাজি ৳${room.minStake.toLocaleString()} এর কম হতে পারবে না।` });
     }

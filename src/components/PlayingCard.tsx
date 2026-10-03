@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Crown, Sparkles, Flame, Zap, Star } from "lucide-react";
 import { sound } from "../utils/audio";
 import { haptics } from "../utils/haptics";
+import { usePerformanceMode } from "../utils/performance";
 
 interface PlayingCardProps {
   card: {
@@ -18,12 +19,13 @@ interface PlayingCardProps {
 export const PlayingCard = React.memo<PlayingCardProps>(({ card, side, isWinner = false }) => {
   const [flipped, setFlipped] = useState<boolean>(false);
   const [isPeeking, setIsPeeking] = useState<boolean>(false);
+  const perf = usePerformanceMode();
 
   // Staggered reveal sequence: Anticipation squeeze/peeking -> 3D flip with granular snap -> Winner snap
   useEffect(() => {
     if (card) {
-      const peekDelay = side === "DRAGON" ? 80 : 420;
-      const flipDelay = side === "DRAGON" ? 220 : 680;
+      const peekDelay = side === "DRAGON" ? 60 : 380;
+      const flipDelay = side === "DRAGON" ? 180 : 580;
 
       const peekTimer = setTimeout(() => setIsPeeking(true), peekDelay);
       const flipTimer = setTimeout(() => {
@@ -50,50 +52,50 @@ export const PlayingCard = React.memo<PlayingCardProps>(({ card, side, isWinner 
   return (
     <motion.div
       initial={{
-        y: -140,
-        x: side === "DRAGON" ? -50 : 50,
-        rotateZ: side === "DRAGON" ? -28 : 28,
-        rotateX: 35,
+        y: -120,
+        x: side === "DRAGON" ? -40 : 40,
+        rotateZ: side === "DRAGON" ? -20 : 20,
+        rotateX: perf.isLowEnd ? 0 : 25,
         opacity: 0,
-        scale: 0.45,
-        boxShadow: "0 45px 65px -8px rgba(0,0,0,0.9)",
+        scale: 0.5,
       }}
       animate={{
         y: 0,
         x: 0,
-        rotateZ: isPeeking ? (side === "DRAGON" ? -4 : 4) : 0,
-        rotateX: isPeeking ? 15 : 0,
+        rotateZ: isPeeking ? (side === "DRAGON" ? -3 : 3) : 0,
+        rotateX: isPeeking && !perf.isLowEnd ? 12 : 0,
         opacity: 1,
         scale: isWinner ? 1.06 : 1,
-        boxShadow: "0 6px 18px -2px rgba(0,0,0,0.98)",
       }}
       exit={{
-        y: 60,
+        y: 50,
         opacity: 0,
-        scale: 0.7,
-        transition: { duration: 0.3 },
+        scale: 0.75,
+        transition: { duration: 0.25 },
       }}
       transition={{
-        type: "spring",
-        stiffness: 280,
-        damping: 22,
-        mass: 0.85,
+        type: perf.isLowEnd ? "tween" : "spring",
+        stiffness: 300,
+        damping: 24,
+        mass: 0.8,
       }}
-      className="relative w-16 h-22 sm:w-18 sm:h-26 select-none cursor-pointer"
-      style={{ perspective: 1400, transformStyle: "preserve-3d", willChange: "transform" }}
+      className={`relative w-16 h-22 sm:w-18 sm:h-26 select-none cursor-pointer gpu-accelerated ${
+        side === "DRAGON" ? "animate-deal-dragon" : "animate-deal-tiger"
+      }`}
+      style={{ perspective: perf.isLowEnd ? undefined : 1200, transformStyle: "preserve-3d", willChange: "transform" }}
     >
       {/* Floating Winner Crown & Celebration Badge */}
       <AnimatePresence>
         {isWinner && flipped && (
           <motion.div
-            initial={{ scale: 0, y: 15, opacity: 0 }}
-            animate={{ scale: 1, y: -18, opacity: 1 }}
+            initial={{ scale: 0, y: 10, opacity: 0 }}
+            animate={{ scale: 1, y: -16, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 450, damping: 18 }}
             className={`absolute -top-1 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1 px-3 py-0.5 rounded-full font-black text-[9px] shadow-2xl whitespace-nowrap border ${
               side === "DRAGON"
-                ? "bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 text-white border-amber-300/90 shadow-[0_0_20px_rgba(239,68,68,0.9)]"
-                : "bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-neutral-950 border-yellow-200 shadow-[0_0_20px_rgba(251,191,36,0.95)]"
+                ? "bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 text-white border-amber-300/90 shadow-[0_0_15px_rgba(239,68,68,0.8)]"
+                : "bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-neutral-950 border-yellow-200 shadow-[0_0_15px_rgba(251,191,36,0.85)]"
             }`}
           >
             <Crown className="w-2.5 h-2.5 fill-current" />
@@ -103,34 +105,24 @@ export const PlayingCard = React.memo<PlayingCardProps>(({ card, side, isWinner 
         )}
       </AnimatePresence>
 
-      {/* Winner High-Voltage Aura with Shooting Energy Halo - limited to 3 cycles */}
+      {/* Winner High-Voltage Aura with Shooting Energy Halo */}
       {isWinner && flipped && (
         <>
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.6, 0.9, 0.6],
-            }}
-            transition={{
-              duration: 1.4,
-              repeat: 3,
-              ease: "easeInOut",
-            }}
-            className={`absolute -inset-2 rounded-2xl filter blur-md pointer-events-none ${
-              side === "DRAGON"
-                ? "bg-gradient-to-r from-red-600/80 via-rose-500/80 to-amber-500/80"
-                : "bg-gradient-to-r from-amber-500/80 via-yellow-400/80 to-orange-500/80"
-            }`}
+          <div
+            className={`absolute -inset-1.5 rounded-2xl pointer-events-none transition-all ${
+              side === "DRAGON" ? "animate-dragon-aura" : "animate-tiger-aura"
+            } ${perf.isLowEnd ? "" : "blur-sm"}`}
           />
-          {/* Radiant Corner Sparkles */}
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: 3, ease: "linear" }}
-            className="absolute -inset-3 pointer-events-none flex items-center justify-between"
-          >
-            <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
-            <Star className="w-3 h-3 text-amber-300 fill-amber-300 delay-300" />
-          </motion.div>
+          {!perf.isLowEnd && (
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: 2, ease: "linear" }}
+              className="absolute -inset-2.5 pointer-events-none flex items-center justify-between"
+            >
+              <Star className="w-3 h-3 text-amber-300 fill-amber-300" />
+              <Star className="w-3 h-3 text-amber-300 fill-amber-300 delay-300" />
+            </motion.div>
+          )}
         </>
       )}
 

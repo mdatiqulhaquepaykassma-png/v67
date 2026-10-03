@@ -138,7 +138,7 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
   
   const [joinPersonalId, setJoinPersonalId] = useState<string>("");
   const [joinPersonalPassword, setJoinPersonalPassword] = useState<string>("");
-  const [challengerStake, setChallengerStake] = useState<string>("1000");
+  const [challengerStake, setChallengerStake] = useState<string>("1");
   const [roomMinStake, setRoomMinStake] = useState<string>("1");
   const [roomMaxStake, setRoomMaxStake] = useState<string>("100000");
   const [selectedRoomDetails, setSelectedRoomDetails] = useState<any | null>(null);
@@ -1199,6 +1199,7 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
                                     e.stopPropagation();
                                     sound.playButtonClick();
                                     setJoinPersonalId(room.id);
+                                    setChallengerStake(String(room.minStake || 1));
                                     setShowJoinPersonal(true);
                                     setPersonalJoinError("");
                                   }}
@@ -1844,19 +1845,22 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
 
                   {/* Challenger Stake input */}
                   <div className="space-y-1.5">
-                    <label className="block text-[11px] uppercase font-bold text-neutral-400 flex items-center gap-1">
-                      <Coins className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Your Stake Amount</span>
+                    <label className="block text-[11px] uppercase font-bold text-neutral-400 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <Coins className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Your Stake Amount (বাজির পরিমাণ)</span>
+                      </span>
+                      <span className="text-amber-400 font-bold text-[10px]">Min: ৳1 chip</span>
                     </label>
                     <input
                       type="number"
                       value={challengerStake}
                       onChange={(e) => setChallengerStake(e.target.value)}
-                      placeholder="1000"
-                      min="10"
+                      placeholder="1"
+                      min="1"
                       className="w-full bg-neutral-950 border border-neutral-800 focus:border-amber-500 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none font-bold"
                     />
-                    <span className="block text-[9px] text-neutral-500">রুম ক্রিয়েটর কর্তৃক নির্ধারিত সর্বনিম্ন ও সর্বোচ্চ বাজির সীমার মধ্যে আপনার বাজি দিন।</span>
+                    <span className="block text-[9px] text-neutral-500">সর্বনিম্ন বাজি ৳১ চিপস থেকে শুরু করে আপনার ইচ্ছামত বাজি নির্ধারণ করতে পারবেন।</span>
                   </div>
 
                   {/* Error label */}

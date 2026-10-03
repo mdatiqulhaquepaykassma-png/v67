@@ -955,6 +955,186 @@ html, body {
   content: '';
 }
 
+/* ============================================================================
+   ADVANCED GPU-ACCELERATED ANIMATIONS (60FPS FOR LOW-END & MOBILE)
+   ============================================================================ */
+
+/* 1. 3D Card Dealing Slide & Flip */
+@keyframes card-deal-shoe-dragon {
+  0% {
+    transform: translate3d(50px, -80px, 0) scale(0.4) rotate(-25deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translate3d(0, 10px, 0) scale(1.08) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes card-deal-shoe-tiger {
+  0% {
+    transform: translate3d(-50px, -80px, 0) scale(0.4) rotate(25deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translate3d(0, 10px, 0) scale(1.08) rotate(-3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.animate-deal-dragon {
+  animation: card-deal-shoe-dragon 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-deal-tiger {
+  animation: card-deal-shoe-tiger 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+
+/* 2. Parabolic Flying Chip & Impact Shockwave */
+@keyframes chip-fly-to-slot {
+  0% {
+    transform: translate3d(0, 40px, 0) scale(0.7) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate3d(0, -15px, 0) scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes chip-impact-ripple {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.animate-chip-fly {
+  animation: chip-fly-to-slot 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.animate-impact-ripple {
+  animation: chip-impact-ripple 0.6s cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+/* 3. Victory Sunburst & Halo */
+@keyframes victory-sunburst-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(180deg) scale(1.15);
+    opacity: 0.9;
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.animate-sunburst-spin {
+  animation: victory-sunburst-spin 12s linear infinite;
+  will-change: transform;
+}
+
+/* 4. Dragon Fire & Tiger Electric Auras */
+@keyframes dragon-aura-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.35), inset 0 0 15px rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(239, 68, 68, 0.7), inset 0 0 25px rgba(239, 68, 68, 0.4);
+    border-color: rgba(252, 165, 165, 1);
+  }
+}
+
+@keyframes tiger-aura-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(245, 158, 11, 0.35), inset 0 0 15px rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.7), inset 0 0 25px rgba(245, 158, 11, 0.4);
+    border-color: rgba(254, 240, 138, 1);
+  }
+}
+
+.animate-dragon-aura {
+  animation: dragon-aura-pulse 1.8s ease-in-out infinite;
+}
+
+.animate-tiger-aura {
+  animation: tiger-aura-pulse 1.8s ease-in-out infinite;
+}
+
+/* 5. 3D Card Sheen Shimmer */
+@keyframes card-sheen {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(250%) rotate(25deg);
+  }
+}
+
+.card-sheen-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-sheen-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 60%
+  );
+  transform: translateX(-150%) rotate(25deg);
+  animation: card-sheen 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* 6. Lightweight Fallbacks for Low-End Mobile & Slow Internet */
+@media (max-width: 640px), (prefers-reduced-motion: reduce) {
+  * {
+    /* Prefer hardware layer for transforms */
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  .smart-glass {
+    backdrop-filter: none !important;
+    background-color: rgba(14, 18, 28, 0.95) !important;
+  }
+}
+
+
 
 
 
