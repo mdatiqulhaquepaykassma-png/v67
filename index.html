@@ -21,16 +21,47 @@
     <link rel="preload" as="image" href="/icon.svg" type="image/svg+xml" fetchpriority="high" />
     <link rel="preload" as="image" href="/pwa-192x192.png" type="image/png" />
 
+    <!-- High-Resolution Card Texture Sheets Preload -->
+    <link rel="preload" as="image" href="/textures/cards/card-texture-sheet.svg" type="image/svg+xml" fetchpriority="high" />
+    <link rel="preload" as="image" href="/textures/cards/card-back-sheet.svg" type="image/svg+xml" fetchpriority="high" />
+
+    <!-- Critical Casino Audio Assets Preload -->
+    <link rel="preload" as="audio" href="/audio/card-flip.wav" type="audio/wav" />
+    <link rel="preload" as="audio" href="/audio/chip-place.wav" type="audio/wav" />
+    <link rel="preload" as="audio" href="/audio/round-gong.wav" type="audio/wav" />
+    <link rel="preload" as="audio" href="/audio/win-fanfare.wav" type="audio/wav" />
+
     <!-- Non-blocking Asset Pre-decode & Audio Warmup Script -->
     <script>
       (function() {
-        // Pre-decode critical UI image assets in browser memory cache
-        ['/app-logo.png', '/icon.svg', '/pwa-192x192.png'].forEach(function(src) {
+        // Pre-decode critical UI & Card texture image assets in browser memory cache
+        [
+          '/app-logo.png',
+          '/icon.svg',
+          '/pwa-192x192.png',
+          '/textures/cards/card-texture-sheet.svg',
+          '/textures/cards/card-back-sheet.svg'
+        ].forEach(function(src) {
           var img = new Image();
           img.src = src;
           if ('decode' in img) {
             img.decode().catch(function() {});
           }
+        });
+
+        // Pre-cache critical casino audio elements to eliminate runtime stalls
+        [
+          '/audio/card-flip.wav',
+          '/audio/chip-place.wav',
+          '/audio/round-gong.wav',
+          '/audio/win-fanfare.wav'
+        ].forEach(function(audioSrc) {
+          try {
+            var audio = new Audio();
+            audio.preload = 'auto';
+            audio.src = audioSrc;
+            audio.load();
+          } catch(e) {}
         });
       })();
     </script>
