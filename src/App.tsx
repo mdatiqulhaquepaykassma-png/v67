@@ -24,6 +24,7 @@ import { GlobalShortcuts } from "./components/GlobalShortcuts";
 import { MobileBottomNav } from "./components/MobileBottomNav";
 import { CurrencySelectorModal } from "./components/CurrencySelectorModal";
 import { TableEntryTransition } from "./components/TableEntryTransition";
+import { NetworkStatusBadge } from "./components/NetworkStatusBadge";
 import { usePWAInstall } from "./utils/usePWAInstall";
 import { useWakeLock } from "./utils/useWakeLock";
 import { useDrag } from "@use-gesture/react";
@@ -635,6 +636,9 @@ export default function App() {
           tablePlayerCounts={telemetry?.tableActivePlayers}
         />
 
+        {/* Offline Network Status Badge */}
+        <NetworkStatusBadge lang={lang} />
+
         {/* Swipe Feedback Toast Notice */}
         <AnimatePresence>
           {swipeNotice && (
@@ -685,6 +689,7 @@ export default function App() {
                   onOpenProfile={() => setIsProfileOpen(true)}
                   onToggleBalanceType={handleToggleBalanceType}
                   onNavigateToP2P={() => handleTabChange("p2p")}
+                  lang={lang}
                 />
               </motion.div>
             )}

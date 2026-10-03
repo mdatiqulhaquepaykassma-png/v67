@@ -43,6 +43,77 @@ export default defineConfig(() => {
             },
           ],
         },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,mp3,wav,webmanifest,json}'],
+          maximumFileSizeToCacheInBytes: 6 * 1024 * 1024,
+          clientsClaim: true,
+          skipWaiting: true,
+          cleanupOutdatedCaches: true,
+          runtimeCaching: [
+            {
+              // Aggressive Cache-First strategy for game audio, cards, background textures & icons
+              urlPattern: /\.(?:png|jpg|jpeg|svg|webp|gif|mp3|wav|ogg|ico)$/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'apex-game-media-v1',
+                expiration: {
+                  maxEntries: 120,
+                  maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+                  purgeOnQuotaError: true,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              // StaleWhileRevalidate for JS & CSS bundles to serve instantly offline while updating in background
+              urlPattern: /\.(?:js|css)$/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'apex-static-resources-v1',
+                expiration: {
+                  maxEntries: 80,
+                  maxAgeSeconds: 14 * 24 * 60 * 60, // 14 Days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              // CacheFirst for external web fonts (Google Fonts / CDN)
+              urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'apex-google-fonts-v1',
+                expiration: {
+                  maxEntries: 30,
+                  maxAgeSeconds: 365 * 24 * 60 * 60, // 1 Year
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              // NetworkFirst for API endpoints to fallback gracefully during intermittent drops
+              urlPattern: /\/api\/.*$/i,
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'apex-api-cache-v1',
+                networkTimeoutSeconds: 6,
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 24 * 60 * 60, // 24 Hours
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
+        },
         devOptions: {
           enabled: false,
         },
@@ -54,15 +125,35 @@ export default defineConfig(() => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 1600,
+      chunkSizeWarningLimit: 1000,
+      target: 'esnext',
+      cssCodeSplit: true,
       rollupOptions: {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('framer-motion') || id.includes('motion')) return 'vendor-motion';
-              if (id.includes('lucide-react')) return 'vendor-icons';
-              if (id.includes('recharts')) return 'vendor-charts';
-              return 'vendor';
+              if (id.includes('react/') || id.includes('react-dom/') || id.includes('scheduler')) {
+                return 'vendor-react-core';
+              }
+              if (id.includes('framer-motion') || id.includes('motion')) {
+                return 'vendor-framer-motion';
+              }
+              if (id.includes('recharts') || id.includes('d3-') || id.includes('victory')) {
+                return 'vendor-recharts';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-lucide-icons';
+              }
+              if (id.includes('canvas-confetti')) {
+                return 'vendor-confetti';
+              }
+              if (id.includes('@google/genai') || id.includes('zod')) {
+                return 'vendor-ai';
+              }
+              if (id.includes('workbox') || id.includes('idb')) {
+                return 'vendor-pwa';
+              }
+              return 'vendor-utils';
             }
           },
         },

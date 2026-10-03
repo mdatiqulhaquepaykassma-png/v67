@@ -291,15 +291,15 @@ export const Navbar = React.memo<NavbarProps>(({
             </button>
           )}
 
-          {/* Bet History Quick Access Button */}
+          {/* Bet History Quick Access Button (Hidden on Mobile, available in Side Menu) */}
           {onOpenBetHistory && (
             <button
               onClick={onOpenBetHistory}
-              className="flex items-center gap-1 bg-gradient-to-r from-neutral-900 to-amber-950/60 hover:from-neutral-800 hover:to-amber-900/80 border border-amber-500/40 hover:border-amber-400 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer text-amber-300 text-xs font-bold"
+              className="hidden md:flex items-center gap-1 bg-gradient-to-r from-neutral-900 to-amber-950/60 hover:from-neutral-800 hover:to-amber-900/80 border border-amber-500/40 hover:border-amber-400 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-xl transition-all shadow-md active:scale-95 cursor-pointer text-amber-300 text-xs font-bold"
               title={lang === "bn" ? "বেটিং হিস্ট্রি দেখুন" : "Bet History"}
             >
               <History className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden xs:inline text-[9.5px] font-black uppercase tracking-wider font-mono">
+              <span className="text-[9.5px] font-black uppercase tracking-wider font-mono">
                 {lang === "bn" ? "হিস্ট্রি" : "History"}
               </span>
             </button>

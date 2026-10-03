@@ -12,7 +12,28 @@
     <link rel="icon" type="image/png" href="/app-logo.png" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preload" as="image" href="/app-logo.png" type="image/png" />
+
+    <!-- Resource Preloading & Performance Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="modulepreload" href="/src/main.tsx" />
+    <link rel="preload" as="image" href="/app-logo.png" type="image/png" fetchpriority="high" />
+    <link rel="preload" as="image" href="/icon.svg" type="image/svg+xml" fetchpriority="high" />
+    <link rel="preload" as="image" href="/pwa-192x192.png" type="image/png" />
+
+    <!-- Non-blocking Asset Pre-decode & Audio Warmup Script -->
+    <script>
+      (function() {
+        // Pre-decode critical UI image assets in browser memory cache
+        ['/app-logo.png', '/icon.svg', '/pwa-192x192.png'].forEach(function(src) {
+          var img = new Image();
+          img.src = src;
+          if ('decode' in img) {
+            img.decode().catch(function() {});
+          }
+        });
+      })();
+    </script>
     <title>APEX CASINO: Dragon Tiger P2P</title>
     <meta name="description" content="High-stakes Dragon Tiger P2P arena with real-time multiplayer rooms, transparency charter, and secure wallet integration." />
     <meta property="og:title" content="APEX CASINO: Dragon Tiger P2P" />

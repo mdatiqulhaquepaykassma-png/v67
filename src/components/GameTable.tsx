@@ -51,9 +51,11 @@ import { sound } from "../utils/audio";
 import { haptics } from "../utils/haptics";
 import { useActiveCurrency, formatCurrency } from "../utils/currency";
 import { usePerformanceMode } from "../utils/performance";
+import { useAdaptiveAsset } from "../utils/performanceAssetDelivery";
 import { LiveChat } from "./LiveChat";
 import { LiveBetFeed } from "./LiveBetFeed";
 import { LiveAction } from "./LiveAction";
+import { LiveBetTransparencyModal } from "./LiveBetTransparencyModal";
 import { WinningSideConfetti } from "./WinningSideConfetti";
 import virtualCasinoBg from "../assets/images/virtual_dragon_tiger_bg.webp";
 import confetti from "canvas-confetti";
@@ -113,6 +115,7 @@ interface GameTableProps {
   onOpenProfile?: () => void;
   onToggleBalanceType?: () => void;
   onNavigateToP2P?: () => void;
+  lang?: "bn" | "en";
 }
 
 export const GameTable = React.memo<GameTableProps>(({
@@ -126,9 +129,11 @@ export const GameTable = React.memo<GameTableProps>(({
   onOpenProfile,
   onToggleBalanceType,
   onNavigateToP2P,
+  lang = "bn",
 }) => {
   const soundManager = useSoundManager();
   const perf = usePerformanceMode();
+  const { url: casinoBgUrl } = useAdaptiveAsset("casinoBg");
 
   // Table Limits & Chip Configuration per Table
   const tableConfigs: Record<
@@ -212,6 +217,8 @@ export const GameTable = React.memo<GameTableProps>(({
   const [showSmartHintModal, setShowSmartHintModal] = useState<boolean>(false);
   const [settingsTab, setSettingsTab] = useState<"settings" | "mute">("settings");
   const [historyTab, setHistoryTab] = useState<"myBets" | "history" | "mute">("myBets");
+  const [liveFeedTab, setLiveFeedTab] = useState<"live" | "history">("live");
+  const [showLiveTransparencyModal, setShowLiveTransparencyModal] = useState<boolean>(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
   const [volumeLevel, setVolumeLevel] = useState<number>(85);
   const [showWinnerList, setShowWinnerList] = useState<boolean>(true);
@@ -2047,6 +2054,20 @@ export const GameTable = React.memo<GameTableProps>(({
           )}
         </AnimatePresence>
 
+        {/* LIVE BETS & WIN/LOSS TRANSPARENCY MODAL */}
+        <LiveBetTransparencyModal
+          isOpen={showLiveTransparencyModal}
+          onClose={() => setShowLiveTransparencyModal(false)}
+          currentRoundBets={currentRoundBets}
+          recentSettledBets={recentSettledBets}
+          currentRound={currentRound}
+          currentUser={user}
+          lang={lang}
+          formatAmt={formatAmt}
+          onFollowBet={handleFollowBet}
+          isBettingOpen={isBettingOpen}
+        />
+
         {/* MY BETS / HISTORY MODAL (Screenshot 2 Exact Implementation) */}
         <AnimatePresence>
           {showHistoryModal && (
@@ -2127,6 +2148,37 @@ export const GameTable = React.memo<GameTableProps>(({
         {/* CENTER LAYER: 3D PERSPECTIVE OVAL CASINO TABLE & REAL CARDS */}
         <div className="relative w-full flex-1 min-h-0 flex items-center justify-center my-auto py-0 sm:py-0.5 overflow-hidden">
            
+           {/* FLOATING LIVE BET TRANSPARENCY CAPSULE */}
+           <motion.button
+             whileHover={{ scale: 1.03 }}
+             whileTap={{ scale: 0.96 }}
+             onClick={() => {
+               sound.playButtonClick();
+               setShowLiveTransparencyModal(true);
+             }}
+             className="absolute top-1 left-2 sm:left-4 z-40 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-amber-500/50 shadow-[0_4px_20px_rgba(0,0,0,0.85)] text-white flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all group pointer-events-auto"
+             title={lang === "bn" ? "লাইভ বেট ও উইন/লস ট্রান্সপারেন্সি দেখুন" : "View Live Bets & Win/Loss Transparency"}
+           >
+             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
+             <div className="flex flex-col text-left">
+               <div className="flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9.5px] font-mono font-black uppercase tracking-wider text-amber-300">
+                 <ShieldCheck className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
+                 <span>{lang === "bn" ? "লাইভ ট্রান্সপারেন্সি" : "Live Transparency"}</span>
+                 <span className="px-1 sm:px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[7px] sm:text-[8px] font-bold">
+                   {currentRoundBets.length > 0 ? currentRoundBets.length : 6} Live
+                 </span>
+               </div>
+               <div className="text-[7px] sm:text-[8px] font-mono text-neutral-300 flex items-center gap-1.5 sm:gap-2">
+                 <span className="text-red-400 font-bold">🐉 {formatAmt(currentDragonPool, true)}</span>
+                 <span className="text-amber-400 font-bold">🐯 {formatAmt(currentTigerPool, true)}</span>
+                 <span className="text-emerald-400 font-bold hidden xxs:inline">
+                   • {lang === "bn" ? "উইন/লস লেজার" : "Win/Loss Ledger"}
+                 </span>
+               </div>
+             </div>
+             <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
+           </motion.button>
+
            {/* 3D OVAL TABLE CONTAINER - Responsive to Screen Resolution with Physical Multi-Layer Parallax */}
            <div 
              ref={tableRef}
@@ -2585,6 +2637,17 @@ export const GameTable = React.memo<GameTableProps>(({
                       <span className="text-[8px]">{showRoadmapPanel ? "▲" : "▼"}</span>
                       <span className="text-[8px] uppercase tracking-wider hidden xs:inline">Road</span>
                     </button>
+                    <button
+                      onClick={() => {
+                        sound.playButtonClick();
+                        setShowLiveTransparencyModal(true);
+                      }}
+                      className="px-1.5 py-0.5 rounded-md bg-amber-500/20 hover:bg-amber-500/35 border border-amber-500/40 text-[9px] text-amber-300 font-mono active:scale-95 transition-all cursor-pointer flex items-center gap-1 shadow-[0_0_8px_rgba(245,158,11,0.25)]"
+                      title={lang === "bn" ? "লাইভ বেট ও উইন/লস ট্রান্সপারেন্সি" : "Live Bets & Win/Loss Transparency"}
+                    >
+                      <ShieldCheck className="w-2.5 h-2.5 text-amber-400" />
+                      <span className="text-[8px] uppercase tracking-wider hidden xs:inline">Bets</span>
+                    </button>
                  </div>
                  <div className="flex items-center gap-1 sm:gap-2">
                     <span className="text-red-300 bg-red-950/80 border border-red-500/30 px-1 sm:px-1.5 py-0.5 rounded flex items-center gap-0.5 sm:gap-1 font-bold text-[8px] sm:text-[10px]">
@@ -2658,6 +2721,7 @@ export const GameTable = React.memo<GameTableProps>(({
                    whileHover={{ scale: 1.01 }}
                    whileTap={{ scale: 0.98 }}
                    onClick={() => handleSelectSide("DRAGON")}
+                   animate={selectedSide === "DRAGON" ? { scale: [1, 1.05, 0.98, 1] } : { scale: 1 }}
                     disabled={isPlacingBet !== null || !isBettingOpen}
                     className={`bet-button col-span-5 relative rounded-xl p-2 sm:p-3 min-h-[60px] xs:min-h-[66px] sm:min-h-[80px] relative rounded-xl p-1.5 sm:p-3 flex flex-col justify-between border-2 transition-all cursor-pointer overflow-hidden select-none ${
                      selectedSide === "DRAGON"
@@ -2677,9 +2741,14 @@ export const GameTable = React.memo<GameTableProps>(({
                     {/* Center: Placed Casino Chip or Dragon Icon */}
                     <div className="my-0.5 sm:my-1.5 flex items-center justify-center relative">
                        {activeConfirmedBet?.side === "DRAGON" ? (
-                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-red-500 via-white to-red-600 border-2 border-red-900 shadow-[0_0_15px_rgba(239,68,68,0.9)] flex items-center justify-center font-black text-[8px] sm:text-[9px] text-neutral-950 font-mono animate-pulse">
+                         <motion.div
+                           initial={{ scale: 0.3, opacity: 0 }}
+                           animate={{ scale: [0.3, 1.3, 1], opacity: 1 }}
+                           transition={{ type: "spring", stiffness: 420, damping: 18 }}
+                           className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-red-500 via-white to-red-600 border-2 border-amber-300 shadow-[0_0_20px_rgba(239,68,68,0.95)] flex items-center justify-center font-black text-[8px] sm:text-[9px] text-neutral-950 font-mono animate-pulse"
+                         >
                             {formatAmt(activeConfirmedBet.amount, true)}
-                         </div>
+                         </motion.div>
                        ) : isPlacingBet === "DRAGON" ? (
                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dashed border-red-400 animate-spin flex items-center justify-center text-xs">
                            ⏳
@@ -2733,6 +2802,7 @@ export const GameTable = React.memo<GameTableProps>(({
                    whileHover={{ scale: 1.01 }}
                    whileTap={{ scale: 0.98 }}
                    onClick={() => handleSelectSide("TIGER")}
+                   animate={selectedSide === "TIGER" ? { scale: [1, 1.05, 0.98, 1] } : { scale: 1 }}
                     disabled={isPlacingBet !== null || !isBettingOpen}
                     className={`bet-button col-span-5 relative rounded-xl p-2 sm:p-3 min-h-[60px] xs:min-h-[66px] sm:min-h-[80px] relative rounded-xl p-1.5 sm:p-3 flex flex-col justify-between border-2 transition-all cursor-pointer overflow-hidden select-none ${
                      selectedSide === "TIGER"
@@ -2767,9 +2837,14 @@ export const GameTable = React.memo<GameTableProps>(({
                        </AnimatePresence>
 
                        {activeConfirmedBet?.side === "TIGER" ? (
-                         <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-amber-400 via-white to-yellow-600 border-2 border-amber-900 shadow-[0_0_15px_rgba(245,158,11,0.9)] flex items-center justify-center font-black text-[8px] sm:text-[9px] text-neutral-950 font-mono animate-pulse">
+                         <motion.div
+                           initial={{ scale: 0.3, opacity: 0 }}
+                           animate={{ scale: [0.3, 1.3, 1], opacity: 1 }}
+                           transition={{ type: "spring", stiffness: 420, damping: 18 }}
+                           className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-amber-400 via-white to-yellow-600 border-2 border-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.95)] flex items-center justify-center font-black text-[8px] sm:text-[9px] text-neutral-950 font-mono animate-pulse"
+                         >
                             {formatAmt(activeConfirmedBet.amount, true)}
-                         </div>
+                         </motion.div>
                        ) : isPlacingBet === "TIGER" ? (
                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-dashed border-amber-400 animate-spin flex items-center justify-center text-xs">
                            ⏳
@@ -2786,51 +2861,6 @@ export const GameTable = React.memo<GameTableProps>(({
                     </div>
                  </motion.button>
 
-              </div>
-
-              {/* LOWER SECTION: SIDE BETS ROW (8 Pill Buttons) - All 1.9x with Distinct Matching */}
-              <div className="bet-buttons-container flex flex-wrap items-stretch gap-1 text-[7px] sm:text-[9px] font-black font-mono select-none w-full">
-                 {[
-                   { side: "DRAGON_EVEN", label: "EVEN", sub: "1.9x", color: "red" },
-                   { side: "DRAGON_ODD", label: "ODD", sub: "1.9x", color: "red" },
-                   { side: "DRAGON_SML", label: "SML", sub: "1.9x", color: "red" },
-                   { side: "DRAGON_BIG", label: "BIG", sub: "1.9x", color: "red" },
-                   { side: "TIGER_BIG", label: "BIG", sub: "1.9x", color: "amber" },
-                   { side: "TIGER_SML", label: "SML", sub: "1.9x", color: "amber" },
-                   { side: "TIGER_ODD", label: "ODD", sub: "1.9x", color: "amber" },
-                   { side: "TIGER_EVEN", label: "EVEN", sub: "1.9x", color: "amber" },
-                 ].map((b) => {
-                   const isSelected = selectedSide === b.side;
-                   const hasActiveBet = activeConfirmedBet?.side === b.side;
-                   const isPlacing = isPlacingBet === b.side;
-                   return (
-                     <button
-                       key={b.side}
-                       onClick={() => handleSelectSide(b.side)}
-                       disabled={isPlacingBet !== null || !isBettingOpen}
-                       className={`bet-button flex-shrink-0 py-1 xs:py-1.5 sm:py-2 px-0.5 xs:px-1 rounded-md sm:rounded-lg text-center uppercase tracking-tighter transition-all cursor-pointer relative min-h-[38px] xs:min-h-[42px] sm:min-h-[46px] flex flex-col items-center justify-center ${!isBettingOpen ? "opacity-60 cursor-not-allowed" : ""} ${
-                         b.color === "red"
-                           ? isSelected
-                             ? "bg-red-700 text-white border-2 border-amber-300 shadow-[0_0_12px_rgba(239,68,68,0.8)] scale-105"
-                             : "bg-red-950/70 hover:bg-red-900/80 border border-red-700/50 text-red-300"
-                           : isSelected
-                             ? "bg-amber-600 text-neutral-950 border-2 border-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.8)] scale-105"
-                             : "bg-amber-950/70 hover:bg-amber-900/80 border border-amber-700/50 text-amber-300"
-                       }`}
-                     >
-                       {hasActiveBet ? (
-                         <span className="absolute -top-1.5 -right-1 px-1 py-0.5 rounded-full bg-amber-400 text-neutral-950 font-black text-[6px] sm:text-[7px] font-mono flex items-center justify-center shadow animate-pulse">
-                           {formatAmt(activeConfirmedBet.amount, true)}
-                         </span>
-                       ) : isPlacing ? (
-                         <span className="absolute -top-1.5 -right-1 w-3.5 h-3.5 rounded-full bg-amber-300 text-neutral-950 font-black text-[6px] flex items-center justify-center shadow animate-spin">
-                           ⏳
-                         </span>
-                       ) : null}
-                       {b.label} <span className="block text-[6px] sm:text-[7px] font-bold text-amber-300 opacity-90">{b.sub}</span>
-                     </button>
-                   );
-                 })}
               </div>
 
               {/* CHIP SELECTOR CAROUSEL & ACTION BUTTONS */}

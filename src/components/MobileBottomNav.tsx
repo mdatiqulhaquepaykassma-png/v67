@@ -109,26 +109,7 @@ export const MobileBottomNav = React.memo<MobileBottomNavProps>(({
         <span className="text-[9px] uppercase tracking-wider font-bold">Elite</span>
       </button>
 
-      {/* 5. Bet History */}
-      {onOpenBetHistory && (
-        <button
-          type="button"
-          onClick={() => {
-            sound.playButtonClick();
-            onOpenBetHistory();
-          }}
-          className="flex-1 flex flex-col items-center justify-center gap-1 text-neutral-400 hover:text-amber-300 transition-all cursor-pointer active:scale-95"
-        >
-          <div className="w-7 h-7 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
-            <History className="w-3.5 h-3.5" />
-          </div>
-          <span className="text-[8.5px] font-mono font-bold text-amber-300 uppercase tracking-wider">
-            History
-          </span>
-        </button>
-      )}
-
-      {/* 6. Wallet */}
+      {/* 5. Wallet */}
       <button
         type="button"
         onClick={() => {
