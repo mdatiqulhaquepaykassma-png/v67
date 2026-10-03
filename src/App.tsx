@@ -44,13 +44,19 @@ export default function App() {
     const checkSession = async () => {
       try {
         const sid = localStorage.getItem("player_session_id") || "";
-        const res = await fetch("/api/auth/me", {
-          headers: sid ? { "x-session-id": sid } : undefined,
-        });
+        const savedUserId = localStorage.getItem("dt_user_id") || "";
+        const headers: Record<string, string> = {};
+        if (sid) headers["x-session-id"] = sid;
+        if (savedUserId) headers["x-user-id"] = savedUserId;
+
+        const res = await fetch("/api/auth/me", { headers });
         if (res.ok) {
           const data = await res.json();
           if (data.success && data.user) {
             setUser(data.user);
+            if (data.sessionId) {
+              localStorage.setItem("player_session_id", data.sessionId);
+            }
           }
         }
       } catch {}
@@ -74,6 +80,9 @@ export default function App() {
         ws.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
+            if (data.type === "SESSION_RESTORED" && data.sessionId) {
+              localStorage.setItem("player_session_id", data.sessionId);
+            }
             if (data.type === "FORCE_LOGOUT") {
               setForcedLogoutReason(data.reason || "আপনার অ্যাকাউন্টে অন্য একটি ডিভাইস থেকে লগইন করা হয়েছে।");
               setUser(null);
@@ -362,7 +371,11 @@ export default function App() {
       return;
     }
     try {
-      const res = await fetch(`/api/wallet/${encodeURIComponent(userId)}?username=${encodeURIComponent(username)}`);
+      const sid = localStorage.getItem("player_session_id") || "";
+      const headers: Record<string, string> = { "x-user-id": userId };
+      if (sid) headers["x-session-id"] = sid;
+
+      const res = await fetch(`/api/wallet/${encodeURIComponent(userId)}?username=${encodeURIComponent(username)}`, { headers });
       if (!res.ok) {
         return;
       }

@@ -41,14 +41,14 @@ const trustedDevices = new Map<string, TrustedDevice[]>(); // userId -> devices
 const pendingOtps = new Map<string, PendingOtp>(); // userId -> otp
 
 /** Client deviceId + user agent stable fingerprint */
-export function deriveDeviceId(req: Request, clientDeviceId?: string): string {
-  const ua = req.get("user-agent") || "";
+export function deriveDeviceId(req?: Request | null, clientDeviceId?: string): string {
+  const ua = req && typeof req.get === "function" ? req.get("user-agent") || "" : "";
   const basis = `${clientDeviceId || ""}|${ua}`;
   return createHash("sha256").update(basis).digest("hex").slice(0, 32);
 }
 
-export function describeDevice(req: Request): string {
-  const ua = req.get("user-agent") || "";
+export function describeDevice(req?: Request | null): string {
+  const ua = req && typeof req.get === "function" ? req.get("user-agent") || "" : "";
   const os =
     /Android/i.test(ua) ? "Android" :
     /iPhone|iPad|iPod/i.test(ua) ? "iOS" :

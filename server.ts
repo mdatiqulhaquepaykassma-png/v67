@@ -1550,14 +1550,23 @@ wss.on("connection", (ws) => {
       const data = JSON.parse(message.toString());
       if (data.type === "IDENTIFY") {
         const sid = String(data.sessionId || "").trim();
-        const session = sid ? getSession(sid) : null;
-        if (!session) {
+        const uid = String(data.userId || "").trim();
+        let session = sid ? getSession(sid) : null;
+
+        // Self-healing session restore if user is valid
+        if (!session && uid && mockUsers[uid]) {
+          const deviceId = deriveDeviceId(undefined, uid);
+          const created = createSessionEvictingOthers(uid, deviceId, "Web App", "");
+          session = created.session;
           try {
-            ws.send(JSON.stringify({ type: "FORCE_LOGOUT", reason: "অবৈধ বা মেয়াদোত্তীর্ণ সেশন" }));
-            ws.close(4001, "invalid-session");
+            ws.send(JSON.stringify({ type: "SESSION_RESTORED", sessionId: session.sessionId }));
           } catch {}
+        }
+
+        if (!session) {
           return;
         }
+
         (ws as any).userId = session.userId;
         (ws as any).sessionId = session.sessionId;
         return;
@@ -1601,8 +1610,23 @@ function requireUser(req: express.Request, res: express.Response, next: express.
     (typeof req.headers["x-session-id"] === "string" ? req.headers["x-session-id"] : null) ||
     bearerToken ||
     (typeof req.body?.sessionId === "string" ? req.body.sessionId : null);
+  const headerUserId = typeof req.headers["x-user-id"] === "string" ? req.headers["x-user-id"] : null;
+  const bodyUserId = typeof req.body?.userId === "string" ? req.body.userId : null;
 
-  const session = sid ? getSession(sid) : null;
+  let session = sid ? getSession(sid) : null;
+
+  // Auto-restore session for known active user if in-memory session was wiped on server reload
+  if (!session && (headerUserId || bodyUserId)) {
+    const targetUid = headerUserId || bodyUserId;
+    if (targetUid && mockUsers[targetUid]) {
+      const deviceId = deriveDeviceId(req, req.body?.deviceId);
+      const deviceLabel = describeDevice(req);
+      const created = createSessionEvictingOthers(targetUid, deviceId, deviceLabel, req.ip || "");
+      session = created.session;
+      trustDevice(targetUid, deviceId, deviceLabel);
+    }
+  }
+
   if (!session) {
     return res.status(401).json({
       success: false,
@@ -1618,9 +1642,10 @@ function requireUser(req: express.Request, res: express.Response, next: express.
 // Current logged in user profile check
 app.get("/api/auth/me", requireUser, (req, res) => {
   const userId = (req as any).userId;
+  const sessionId = (req as any).sessionId;
   const user = mockUsers[userId];
   if (!user) return res.status(404).json({ success: false, error: "ব্যবহারকারী পাওয়া যায়নি।" });
-  res.json({ success: true, user });
+  res.json({ success: true, user, sessionId });
 });
 
 // Real-Time Chat REST Endpoints

@@ -1204,9 +1204,14 @@ export const GameTable = React.memo<GameTableProps>(({
     setIsPlacingBet(side);
     triggerFlyingChipAnimation(side, amount);
     try {
+      const sid = localStorage.getItem("player_session_id") || "";
       const res = await fetch("/api/game/bet", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.userId,
+          ...(sid ? { "x-session-id": sid } : {}),
+        },
         body: JSON.stringify({
           userId: user.userId,
           tableSlug: selectedTableSlug,
@@ -1265,9 +1270,14 @@ export const GameTable = React.memo<GameTableProps>(({
     if (!activeConfirmedBet || cancelingBet) return;
     setCancelingBet(true);
     try {
+      const sid = localStorage.getItem("player_session_id") || "";
       const res = await fetch("/api/game/cancel-bet", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.userId,
+          ...(sid ? { "x-session-id": sid } : {}),
+        },
         body: JSON.stringify({
           userId: user.userId,
           tableSlug: selectedTableSlug,
@@ -1278,7 +1288,9 @@ export const GameTable = React.memo<GameTableProps>(({
       if (data.success) {
         soundManager.playButtonClick();
         setActiveConfirmedBet(null);
-        fetch(`/api/wallet/${user.userId}`)
+        const headers: Record<string, string> = { "x-user-id": user.userId };
+        if (sid) headers["x-session-id"] = sid;
+        fetch(`/api/wallet/${user.userId}`, { headers })
           .then((r) => r.json())
           .then((updated) => onUpdateWallet(updated));
       } else {
@@ -1296,9 +1308,14 @@ export const GameTable = React.memo<GameTableProps>(({
     if (demoResetLoading) return;
     setDemoResetLoading(true);
     try {
+      const sid = localStorage.getItem("player_session_id") || "";
       const res = await fetch(`/api/wallet/${user.userId}/reset-demo`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user.userId,
+          ...(sid ? { "x-session-id": sid } : {}),
+        },
       });
       const data = await res.json();
       if (data.success && data.user) {
