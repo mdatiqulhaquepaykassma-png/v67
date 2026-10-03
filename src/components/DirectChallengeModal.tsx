@@ -55,8 +55,6 @@ export const DirectChallengeModal: React.FC<DirectChallengeModalProps> = ({
   const [createdRoom, setCreatedRoom] = useState<P2PRoom | null>(null);
   const [copiedMatchId, setCopiedMatchId] = useState<boolean>(false);
 
-  if (!isOpen) return null;
-
   // Generate temporary shared match ID preview
   const tempMatchId = createdRoom
     ? createdRoom.id
@@ -141,23 +139,25 @@ export const DirectChallengeModal: React.FC<DirectChallengeModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={onClose}
-          className="fixed inset-0 bg-black/85 backdrop-blur-md -z-10"
-        />
+      {isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4 overflow-y-auto select-none">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/85 backdrop-blur-md -z-10"
+          />
 
-        {/* Modal Window */}
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0, y: 15 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          exit={{ scale: 0.95, opacity: 0, y: 15 }}
-          className="w-full max-w-lg bg-[#0e131f] border-2 border-amber-500/50 rounded-3xl p-5 sm:p-6 shadow-[0_25px_60px_rgba(0,0,0,0.9)] text-white space-y-4 relative overflow-hidden"
-        >
+          {/* Modal Window */}
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0, y: 15 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.95, opacity: 0, y: 15 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-lg bg-[#0e131f] border-2 border-amber-500/50 rounded-3xl p-5 sm:p-6 shadow-[0_25px_60px_rgba(0,0,0,0.9)] text-white space-y-4 relative overflow-hidden"
+          >
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div className="flex items-center gap-3">
@@ -426,6 +426,7 @@ export const DirectChallengeModal: React.FC<DirectChallengeModalProps> = ({
           )}
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 };

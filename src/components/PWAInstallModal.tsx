@@ -34,8 +34,6 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
   const [installing, setInstalling] = useState(false);
   const [installSuccess, setInstallSuccess] = useState(false);
 
-  if (!isOpen) return null;
-
   const handleDirectInstall = async () => {
     sound.playButtonClick();
     setInstalling(true);
@@ -55,14 +53,15 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.92, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.92, y: 20 }}
-          transition={{ type: "spring", damping: 22, stiffness: 350 }}
-          className="w-full max-w-sm bg-[#090d15] border border-amber-500/40 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col text-neutral-100 relative"
-        >
+      {isOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md select-none">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ duration: 0.2 }}
+            className="w-full max-w-sm bg-[#090d15] border border-amber-500/40 rounded-3xl shadow-[0_25px_70px_rgba(0,0,0,0.95)] overflow-hidden flex flex-col text-neutral-100 relative"
+          >
           {/* Close button */}
           <button
             onClick={() => {
@@ -159,6 +158,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
           </div>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 };

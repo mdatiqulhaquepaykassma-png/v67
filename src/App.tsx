@@ -258,11 +258,29 @@ export default function App() {
 
   const bindTabSwipe = useDrag(
     ({ swipe: [swipeX], movement: [mx], direction: [dirX], event, last }) => {
-      // Ignore drags originating inside horizontal scrollable elements or buttons
+      // Ignore drags originating inside horizontal scrollable elements, modals, or fixed overlays
+      const isAnyModalOpen =
+        isWalletOpen ||
+        isProfileOpen ||
+        isProvablyFairOpen ||
+        isRoadmapOpen ||
+        isMerchantOpen ||
+        isLiquidityOpen ||
+        isBetHistoryOpen ||
+        isGameRulesOpen ||
+        isTransparencyOpen ||
+        isReferralOpen ||
+        isMenuOpen ||
+        isOnlineUsersOpen ||
+        isCurrencySelectorOpen ||
+        tableTransitionOpen;
+
+      if (isAnyModalOpen) return;
+
       const targetEl = event.target as HTMLElement | null;
       if (
         targetEl &&
-        targetEl.closest(".no-scrollbar, .overflow-x-auto, input[type='range'], [data-prevent-swipe='true']")
+        targetEl.closest(".no-scrollbar, .overflow-x-auto, input[type='range'], [data-prevent-swipe='true'], [role='dialog'], [role='alertdialog'], .fixed")
       ) {
         return;
       }
