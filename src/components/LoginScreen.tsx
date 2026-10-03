@@ -4,6 +4,7 @@ import { UserWallet } from "../types";
 import { sound } from "../utils/audio";
 import { BUILD_NUMBER } from "../config/version";
 import { getDeviceId } from "../utils/deviceId";
+import { BrandLogo } from "./BrandLogo";
 
 interface LoginScreenProps {
   onLoginSuccess: (user: UserWallet) => void;
@@ -184,7 +185,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess, onOpen
         {/* Brand Header */}
         <div className="text-center mb-2.5 sm:mb-4">
           <div className="inline-flex w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 border-amber-400 shadow-2xl shadow-amber-500/30 mb-2 items-center justify-center bg-black">
-            <img src="/app-logo.png" alt="APEX Dragon Tiger" className="w-full h-full object-cover" />
+            <BrandLogo priority alt="APEX Dragon Tiger" />
           </div>
           <h1 className="text-xl sm:text-2xl font-black tracking-tight text-white leading-none">
             DRAGON TIGER ARENA

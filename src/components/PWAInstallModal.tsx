@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { sound } from "../utils/audio";
+import { BrandLogo } from "./BrandLogo";
 
 interface PWAInstallModalProps {
   isOpen: boolean;
@@ -78,11 +79,7 @@ export const PWAInstallModal: React.FC<PWAInstallModalProps> = ({
           <div className="pt-8 pb-4 px-6 flex flex-col items-center text-center bg-gradient-to-b from-amber-500/15 via-transparent to-transparent">
             <div className="relative mb-3">
               <div className="w-24 h-24 rounded-3xl overflow-hidden border-2 border-amber-400 shadow-[0_0_35px_rgba(245,158,11,0.5)] bg-black shrink-0">
-                <img
-                  src="/app-logo.png"
-                  alt="APEX Dragon Tiger"
-                  className="w-full h-full object-cover"
-                />
+                <BrandLogo priority alt="APEX Dragon Tiger" />
               </div>
               <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-amber-500 text-neutral-950 font-black text-[9px] uppercase tracking-wider font-mono shadow-md">
                 APP

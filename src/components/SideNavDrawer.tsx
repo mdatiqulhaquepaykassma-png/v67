@@ -36,6 +36,7 @@ import {
 import { UserWallet } from "../types";
 import { useSoundManager } from "../utils/useSoundManager";
 import { CURRENCIES, getStoredCurrencyCode } from "../utils/currency";
+import { BrandLogo } from "./BrandLogo";
 
 interface SideNavDrawerProps {
   isOpen: boolean;
@@ -140,7 +141,7 @@ export const SideNavDrawer: React.FC<SideNavDrawerProps> = ({
           <div className="p-3 sm:p-4 pr-12 sm:pr-16 border-b border-white/10 bg-[#101622] flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden border border-amber-400/60 shadow-[0_0_12px_rgba(245,158,11,0.5)] shrink-0 bg-black flex items-center justify-center">
-                <img src="/app-logo.png" alt="APEX Dragon Tiger" className="w-full h-full object-cover" />
+                <BrandLogo alt="APEX Dragon Tiger" />
               </div>
               <div>
                 <h2 className="text-xs sm:text-sm font-black text-white tracking-wide">

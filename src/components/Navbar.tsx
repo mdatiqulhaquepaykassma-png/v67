@@ -14,6 +14,7 @@ import {
 import { UserWallet } from "../types";
 import { formatCurrency, CURRENCIES, getStoredCurrencyCode } from "../utils/currency";
 import { motion, AnimatePresence } from "framer-motion";
+import { BrandLogo } from "./BrandLogo";
 
 interface NavbarProps {
   user: UserWallet;
@@ -155,7 +156,7 @@ export const Navbar = React.memo<NavbarProps>(({
             className="flex items-center gap-1.5 sm:gap-2 group cursor-pointer"
           >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl overflow-hidden border border-amber-400/60 shadow-[0_0_15px_rgba(245,158,11,0.5)] transition-transform group-hover:scale-105 shrink-0 bg-black flex items-center justify-center">
-              <img src="/app-logo.png" alt="APEX Dragon Tiger" className="w-full h-full object-cover" />
+              <BrandLogo priority alt="APEX Dragon Tiger" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="text-xs sm:text-sm font-black tracking-[0.15em] text-white">SANCTUM</span>
