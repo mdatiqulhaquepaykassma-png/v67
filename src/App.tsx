@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { UserWallet, TableRound, RoadmapItem, HighLoadTelemetry } from "./types";
 import { LoginScreen } from "./components/LoginScreen";
 import { Navbar } from "./components/Navbar";
@@ -239,6 +239,11 @@ export default function App() {
     setTableTransitionOpen(false);
   }, []);
 
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    isInitialMount.current = false;
+  }, []);
+
   const handleTabChange = (newTab: "game" | "p2p" | "leaderboard") => {
     if (newTab === activeTab) return;
     const dir = tabIndexMap[newTab] > tabIndexMap[activeTab] ? 1 : -1;
@@ -247,11 +252,16 @@ export default function App() {
   };
 
   const tabSlideVariants = {
-    initial: (dir: number) => ({
-      opacity: 0,
-      x: dir > 0 ? 45 : -45,
-      scale: 0.99,
-    }),
+    initial: (dir: number) => {
+      if (isInitialMount.current || dir === 0) {
+        return { opacity: 1, x: 0, scale: 1 };
+      }
+      return {
+        opacity: 0,
+        x: dir > 0 ? 45 : -45,
+        scale: 0.99,
+      };
+    },
     animate: {
       opacity: 1,
       x: 0,
@@ -656,12 +666,12 @@ export default function App() {
 
         {/* Gesture Swipe Container for Tab Navigation */}
         <div {...bindTabSwipe()} className="w-full flex-1 flex flex-col relative touch-pan-y">
-          <AnimatePresence mode="wait" custom={tabDirection}>
+          <AnimatePresence mode="wait" initial={false} custom={tabDirection}>
             <motion.main
               key={activeTab}
               custom={tabDirection}
               variants={tabSlideVariants}
-              initial="initial"
+              initial={isInitialMount.current ? false : "initial"}
               animate="animate"
               exit="exit"
               className={`w-full relative ${
@@ -673,9 +683,9 @@ export default function App() {
             {activeTab === "game" && (
               <motion.div
                 key={`game-table-container-${selectedTable}`}
-                initial={{ opacity: 0, scale: 0.94, filter: "blur(4px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                initial={false}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 className="w-full h-full max-h-full flex flex-col flex-1 min-h-0 overflow-hidden"
               >
                 <GameTable

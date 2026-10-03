@@ -437,6 +437,9 @@ export const GameTable = React.memo<GameTableProps>(({
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
+        // Ignore unmeasured 0x0 or collapsed layout on reload
+        if (width < 100 || height < 100) return;
+
         // Calculate appropriate scale factor based on viewport container width and height
         // Baseline: ~740px width and ~540px height corresponds to 1.0 scale
         // When viewport is constrained (e.g. mobile portrait or landscape), calculate scale
@@ -2270,7 +2273,7 @@ export const GameTable = React.memo<GameTableProps>(({
 
                  {/* TOP SECTION: BURN CARD (LEFT) & DECK SHOE (CENTER) */}
                  <div 
-                   className="table-layer-cards-ui w-full flex items-start justify-between relative z-10 px-8 sm:px-16 pt-1 transition-transform duration-150"
+                   className="table-layer-cards-ui w-full flex items-start justify-between relative z-10 px-8 sm:px-16 pt-1"
                    style={{
                      transform: `scale(${Math.min(cardScale, 1)})`,
                      transformOrigin: "top center",
@@ -2435,7 +2438,7 @@ export const GameTable = React.memo<GameTableProps>(({
 
                  {/* DEALT PLAYING CARDS & DEDICATED FELT BOXES (Centerstage) */}
                  <div 
-                   className="relative z-20 flex items-center justify-center gap-2 xs:gap-4 sm:gap-12 md:gap-16 my-auto transition-transform duration-150 max-w-full px-1"
+                   className="relative z-20 flex items-center justify-center gap-2 xs:gap-4 sm:gap-12 md:gap-16 my-auto max-w-full px-1"
                    style={{
                      transform: `scale(${cardScale})`,
                      transformOrigin: "center center",
