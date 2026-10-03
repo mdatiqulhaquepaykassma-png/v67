@@ -1499,7 +1499,7 @@ setInterval(() => {
         duel.acceptorPeeked = true;
         duel.status = "BETTING";
         duel.turnUser = "DRAGON";
-        duel.secondsRemaining = 15;
+        duel.secondsRemaining = 60;
         duel.lastUpdated = Date.now();
         broadcast({ type: "DUEL_STATE_CHANGE", roomId: duel.id, status: "BETTING" });
       }
@@ -3224,7 +3224,7 @@ app.post("/api/rooms/accept", requireUser, (req, res) => {
     currentRaise: Math.max(room.amount, requiredAcceptorStake),
     bettingRound: 1,
     turnUser: "DRAGON",
-    secondsRemaining: 15,
+    secondsRemaining: 60,
     raisesCount: 0,
     lastUpdated: Date.now(),
   };
@@ -3301,7 +3301,7 @@ app.post("/api/rooms/duel/:roomId/peek", (req, res) => {
   if (duel.creatorPeeked && duel.acceptorPeeked && duel.status === "PEEK_CARDS") {
     duel.status = "BETTING";
     duel.turnUser = "DRAGON";
-    duel.secondsRemaining = 15;
+    duel.secondsRemaining = 60;
     broadcast({ type: "DUEL_STATE_CHANGE", roomId: duel.id, status: "BETTING" });
   }
   
@@ -3390,7 +3390,7 @@ app.post("/api/rooms/duel/:roomId/action", requireUser, (req, res) => {
       duel.creatorAction = undefined;
       duel.acceptorAction = undefined;
       duel.turnUser = "DRAGON";
-      duel.secondsRemaining = 15;
+      duel.secondsRemaining = 60;
     } else {
       duel.status = "SHOWDOWN";
       duel.secondsRemaining = 3;
@@ -3398,7 +3398,7 @@ app.post("/api/rooms/duel/:roomId/action", requireUser, (req, res) => {
     }
   } else {
     duel.turnUser = otherRole;
-    duel.secondsRemaining = 15;
+    duel.secondsRemaining = 60;
   }
   
   duel.lastUpdated = Date.now();

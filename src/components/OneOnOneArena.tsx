@@ -625,7 +625,7 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
       currentRaise: ante,
       bettingRound: 1,
       turnUser: "DRAGON",
-      secondsRemaining: 15,
+      secondsRemaining: 60,
       raisesCount: 0,
       spectatorsCount: Math.floor(Math.random() * 12) + 5,
       winnerRole: match.winner.toUpperCase() as "DRAGON" | "TIGER" | "TIE",
@@ -1886,17 +1886,17 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
       {activeMode === "in_match" && duel && (
         <div className="space-y-4">
           {/* Top Battle Screen Utility Bar */}
-          <div className="bg-neutral-900/90 border border-amber-500/30 rounded-2xl p-3 sm:p-4 flex items-center justify-between shadow-2xl backdrop-blur-md">
-            <div className="flex items-center gap-3">
+          <div className="bg-neutral-900/90 border border-amber-500/30 rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-2.5 shadow-2xl backdrop-blur-md">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   sound.playButtonClick();
                   setActiveMode("lobby");
                 }}
-                className="px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold border border-neutral-700 transition-all flex items-center gap-1.5"
+                className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold border border-neutral-700 transition-all flex items-center gap-1.5"
               >
                 <X className="w-4 h-4 text-amber-400" />
-                <span>Exit Duel</span>
+                <span>Exit</span>
               </button>
               <div className="text-xs font-bold text-neutral-300 flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-amber-400" />
@@ -1904,16 +1904,37 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
               </div>
             </div>
 
+            {/* Turn & 1-Minute Countdown Badge */}
+            {duel.status === "BETTING" && (
+              <div className={`flex items-center gap-2 px-3.5 py-1.5 rounded-2xl border transition-all ${
+                duel.secondsRemaining <= 10
+                  ? "bg-red-500/20 border-red-500/80 text-red-400 animate-pulse shadow-lg shadow-red-500/30"
+                  : duel.secondsRemaining <= 20
+                  ? "bg-amber-500/20 border-amber-500/60 text-amber-300 shadow-md"
+                  : "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+              }`}>
+                <Clock className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
+                <div className="flex flex-col text-left leading-none">
+                  <span className="text-[9px] uppercase font-mono font-bold tracking-wider opacity-80">
+                    {duel.turnUser === duel.userRole ? "YOUR TURN" : "OPPONENT'S TURN"}
+                  </span>
+                  <span className="text-xs sm:text-sm font-black font-mono">
+                    {Math.floor(duel.secondsRemaining / 60)}:{(duel.secondsRemaining % 60).toString().padStart(2, '0')}s
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Spectator Count */}
-            <div className="flex items-center gap-2 bg-neutral-950/80 px-3 py-1 rounded-full border border-neutral-800 text-xs text-neutral-400">
+            <div className="hidden sm:flex items-center gap-2 bg-neutral-950/80 px-3 py-1 rounded-full border border-neutral-800 text-xs text-neutral-400">
               <Eye className="w-4 h-4 text-emerald-400 animate-pulse" />
-              <span>👁️ {duel.spectatorsCount} watching live</span>
+              <span>{duel.spectatorsCount} live</span>
             </div>
 
             {/* Live Pot Badge */}
-            <div className="bg-gradient-to-r from-amber-500/20 via-neutral-950 to-amber-500/20 border border-amber-500/50 px-4 py-1.5 rounded-2xl text-center">
-              <div className="text-[10px] uppercase font-bold text-amber-300">TOTAL POT IN ESCROW</div>
-              <div className="text-base sm:text-lg font-black text-amber-400">
+            <div className="bg-gradient-to-r from-amber-500/20 via-neutral-950 to-amber-500/20 border border-amber-500/50 px-3.5 sm:px-4 py-1.5 rounded-2xl text-center">
+              <div className="text-[9px] sm:text-[10px] uppercase font-bold text-amber-300">POT IN ESCROW</div>
+              <div className="text-sm sm:text-base font-black text-amber-400">
                 ৳{duel.currentPot.toLocaleString()}
               </div>
             </div>
@@ -1924,6 +1945,22 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
             {/* Background Felt Graphic Glows */}
             <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Live 1-Minute Countdown Progress Bar across the Felt */}
+            {duel.status === "BETTING" && (
+              <div className="w-full bg-neutral-900/80 rounded-full h-2.5 p-0.5 border border-white/10 mb-3 sm:mb-4 overflow-hidden shadow-inner relative z-20">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ${
+                    duel.secondsRemaining <= 10
+                      ? "bg-gradient-to-r from-red-600 via-red-500 to-amber-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]"
+                      : duel.secondsRemaining <= 25
+                      ? "bg-gradient-to-r from-amber-500 to-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+                      : "bg-gradient-to-r from-emerald-500 via-amber-400 to-amber-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                  }`}
+                  style={{ width: `${Math.max(0, Math.min(100, (duel.secondsRemaining / 60) * 100))}%` }}
+                />
+              </div>
+            )}
 
             {/* Floating Emotes Layer */}
             {floatingEmotes.map((fe) => (
@@ -2239,9 +2276,22 @@ export const OneOnOneArena: React.FC<OneOnOneArenaProps> = ({ user, onUpdateWall
             {/* Poker Betting Action Toolbar (Sticky Bottom Safe Area) */}
             {duel.status === "BETTING" && (
               <div className="sticky bottom-[62px] md:bottom-3 z-30 p-3.5 sm:p-4 bg-[#0F1420]/95 border-2 border-amber-500/60 rounded-2xl space-y-2.5 shadow-2xl backdrop-blur-xl ring-1 ring-amber-500/30 my-3">
-                <div className="flex items-center justify-between text-xs font-bold text-amber-300">
-                  <span>YOUR TURN TO ACT (15s Timer)</span>
-                  <span>Raises: {duel.raisesCount}/3</span>
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <div className="flex items-center gap-2">
+                    <span className={duel.turnUser === duel.userRole ? "text-amber-300" : "text-neutral-400"}>
+                      {duel.turnUser === duel.userRole ? "YOUR TURN TO ACT" : "WAITING FOR OPPONENT"}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-black ${
+                      duel.secondsRemaining <= 10
+                        ? "bg-red-500 text-white animate-pulse"
+                        : duel.secondsRemaining <= 20
+                        ? "bg-amber-500 text-neutral-950"
+                        : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    }`}>
+                      ⏱️ {Math.floor(duel.secondsRemaining / 60)}:{(duel.secondsRemaining % 60).toString().padStart(2, '0')}s
+                    </span>
+                  </div>
+                  <span className="text-amber-400/80 font-mono text-[11px]">Raises: {duel.raisesCount}/3</span>
                 </div>
 
                 {/* Poker Actions Buttons */}
