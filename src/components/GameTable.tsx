@@ -57,6 +57,7 @@ import { LiveBetFeed } from "./LiveBetFeed";
 import { LiveAction } from "./LiveAction";
 import { LiveBetTransparencyModal } from "./LiveBetTransparencyModal";
 import { WinningSideConfetti } from "./WinningSideConfetti";
+import { useRenderTracker, perfMonitor } from "../utils/perfDebugMonitor";
 import virtualCasinoBg from "../assets/images/virtual_dragon_tiger_bg.webp";
 import confetti from "canvas-confetti";
 
@@ -131,6 +132,7 @@ export const GameTable = React.memo<GameTableProps>(({
   onNavigateToP2P,
   lang = "bn",
 }) => {
+  useRenderTracker("GameTable");
   const soundManager = useSoundManager();
   const perf = usePerformanceMode();
   const { url: casinoBgUrl } = useAdaptiveAsset("casinoBg");
@@ -1214,6 +1216,7 @@ export const GameTable = React.memo<GameTableProps>(({
     }
 
     setIsPlacingBet(side);
+    perfMonitor.recordInteraction(`Place Bet: ${side} (${amount})`);
     triggerFlyingChipAnimation(side, amount);
     try {
       const sid = localStorage.getItem("player_session_id") || "";
@@ -2151,37 +2154,6 @@ export const GameTable = React.memo<GameTableProps>(({
         {/* CENTER LAYER: 3D PERSPECTIVE OVAL CASINO TABLE & REAL CARDS */}
         <div className="relative w-full flex-1 min-h-0 flex items-center justify-center my-auto py-0 sm:py-0.5 overflow-hidden">
            
-           {/* FLOATING LIVE BET TRANSPARENCY CAPSULE */}
-           <motion.button
-             whileHover={{ scale: 1.03 }}
-             whileTap={{ scale: 0.96 }}
-             onClick={() => {
-               sound.playButtonClick();
-               setShowLiveTransparencyModal(true);
-             }}
-             className="absolute top-1 left-2 sm:left-4 z-40 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-black/85 hover:bg-black/95 backdrop-blur-xl border border-amber-500/50 shadow-[0_4px_20px_rgba(0,0,0,0.85)] text-white flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-all group pointer-events-auto"
-             title={lang === "bn" ? "লাইভ বেট ও উইন/লস ট্রান্সপারেন্সি দেখুন" : "View Live Bets & Win/Loss Transparency"}
-           >
-             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.9)]" />
-             <div className="flex flex-col text-left">
-               <div className="flex items-center gap-1 sm:gap-1.5 text-[8px] sm:text-[9.5px] font-mono font-black uppercase tracking-wider text-amber-300">
-                 <ShieldCheck className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-amber-400" />
-                 <span>{lang === "bn" ? "লাইভ ট্রান্সপারেন্সি" : "Live Transparency"}</span>
-                 <span className="px-1 sm:px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[7px] sm:text-[8px] font-bold">
-                   {currentRoundBets.length > 0 ? currentRoundBets.length : 6} Live
-                 </span>
-               </div>
-               <div className="text-[7px] sm:text-[8px] font-mono text-neutral-300 flex items-center gap-1.5 sm:gap-2">
-                 <span className="text-red-400 font-bold">🐉 {formatAmt(currentDragonPool, true)}</span>
-                 <span className="text-amber-400 font-bold">🐯 {formatAmt(currentTigerPool, true)}</span>
-                 <span className="text-emerald-400 font-bold hidden xxs:inline">
-                   • {lang === "bn" ? "উইন/লস লেজার" : "Win/Loss Ledger"}
-                 </span>
-               </div>
-             </div>
-             <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 group-hover:translate-x-0.5 transition-transform" />
-           </motion.button>
-
            {/* 3D OVAL TABLE CONTAINER - Responsive to Screen Resolution with Physical Multi-Layer Parallax */}
            <div 
              ref={tableRef}

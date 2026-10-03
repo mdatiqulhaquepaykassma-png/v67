@@ -4,6 +4,7 @@ import { Crown, Sparkles, Flame, Zap, Star } from "lucide-react";
 import { sound } from "../utils/audio";
 import { haptics } from "../utils/haptics";
 import { usePerformanceMode } from "../utils/performance";
+import { useRenderTracker } from "../utils/perfDebugMonitor";
 
 interface PlayingCardProps {
   card: {
@@ -17,6 +18,7 @@ interface PlayingCardProps {
 }
 
 export const PlayingCard = React.memo<PlayingCardProps>(({ card, side, isWinner = false }) => {
+  useRenderTracker("PlayingCard", { side, card: card?.display });
   const [flipped, setFlipped] = useState<boolean>(false);
   const [isPeeking, setIsPeeking] = useState<boolean>(false);
   const perf = usePerformanceMode();

@@ -23,6 +23,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { LiveBetRecord, UserWallet, TableRound } from "../types";
 import { sound } from "../utils/audio";
+import { useRenderTracker } from "../utils/perfDebugMonitor";
 
 interface LiveBetTransparencyModalProps {
   isOpen: boolean;
@@ -49,6 +50,7 @@ export const LiveBetTransparencyModal: React.FC<LiveBetTransparencyModalProps> =
   onFollowBet,
   isBettingOpen = false,
 }) => {
+  useRenderTracker("LiveBetTransparencyModal", { isOpen });
   const [activeTab, setActiveTab] = useState<"liveBets" | "winLoss" | "provablyFair">("liveBets");
   const [filterSide, setFilterSide] = useState<"ALL" | "DRAGON" | "TIGER" | "TIE" | "WHALES" | "MINE">("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");

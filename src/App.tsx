@@ -31,9 +31,11 @@ import { useDrag } from "@use-gesture/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { sound } from "./utils/audio";
 import { getStoredCurrencyCode, setStoredCurrencyCode } from "./utils/currency";
+import { perfMonitor, useRenderTracker } from "./utils/perfDebugMonitor";
 import { ShieldAlert } from "lucide-react";
 
 export default function App() {
+  useRenderTracker("App");
   const [user, setUser] = useState<UserWallet | null>(null);
   const [forcedLogoutReason, setForcedLogoutReason] = useState<string | null>(null);
 
@@ -228,6 +230,7 @@ export default function App() {
     setTransitionTableIcon(tableInfo.icon);
     setTableTransitionOpen(true);
     setSelectedTable(tableSlug);
+    perfMonitor.recordInteraction(`Select Table: ${tableSlug}`);
 
     if (activeTab !== "game") {
       setTabDirection(-1);
@@ -249,6 +252,7 @@ export default function App() {
     const dir = tabIndexMap[newTab] > tabIndexMap[activeTab] ? 1 : -1;
     setTabDirection(dir);
     setActiveTab(newTab);
+    perfMonitor.recordInteraction(`Switch Tab to: ${newTab}`);
   };
 
   const tabSlideVariants = {
