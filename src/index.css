@@ -1,11 +1,17 @@
 @import "tailwindcss";
 
-html, body {
+html, body, #root {
   background-color: #02050b !important;
   color: #f5f5f5;
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
+  height: 100vh !important;
+  height: 100dvh !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 @layer utilities {

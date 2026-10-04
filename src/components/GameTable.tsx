@@ -2157,7 +2157,7 @@ export const GameTable = React.memo<GameTableProps>(({
            {/* 3D OVAL TABLE CONTAINER - Responsive to Screen Resolution with Physical Multi-Layer Parallax */}
            <div 
              ref={tableRef}
-             className="table-parallax-container relative w-full max-w-full lg:max-w-5xl h-full max-h-[32vh] xs:max-h-[36vh] sm:max-h-[42vh] lg:max-h-[46vh] aspect-[2.1/1] sm:aspect-[2.35/1] flex items-center justify-center select-none"
+             className="table-parallax-container relative w-full max-w-full lg:max-w-5xl h-full max-h-[16vh] xs:max-h-[20vh] sm:max-h-[30vh] md:max-h-[38vh] lg:max-h-[44vh] aspect-[2.4/1] sm:aspect-[2.35/1] flex items-center justify-center select-none"
            >
               
               {/* Layer 1: Carved Luxury Metallic Pedestal Base */}

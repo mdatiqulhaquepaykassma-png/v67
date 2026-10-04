@@ -25,6 +25,7 @@ import { MobileBottomNav } from "./components/MobileBottomNav";
 import { CurrencySelectorModal } from "./components/CurrencySelectorModal";
 import { TableEntryTransition } from "./components/TableEntryTransition";
 import { NetworkStatusBadge } from "./components/NetworkStatusBadge";
+import { MemoryMonitor } from "./components/MemoryMonitor";
 import { usePWAInstall } from "./utils/usePWAInstall";
 import { useWakeLock } from "./utils/useWakeLock";
 import { useDrag } from "@use-gesture/react";
@@ -574,7 +575,7 @@ export default function App() {
   }
 
   return (
-    <div className={`w-full text-neutral-100 flex flex-col font-sans selection:bg-amber-500 selection:text-neutral-950 relative ${activeTab === "game" ? "h-[100dvh] overflow-hidden bg-black select-none" : "min-h-[100dvh] bg-[#02050b] overflow-x-hidden"}`}>
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] text-neutral-100 flex flex-col font-sans selection:bg-amber-500 selection:text-neutral-950 overflow-hidden bg-[#02050b] select-none">
       {/* Immersive Atmospheric Glows (Strictly inert and placed behind all interactive layers) */}
       <div
         aria-hidden="true"
@@ -599,7 +600,7 @@ export default function App() {
         />
       </div>
 
-      <div className={`w-full flex-1 flex flex-col relative z-10 ${activeTab === "game" ? "h-full max-h-full overflow-hidden pb-14 md:pb-0 min-h-0" : "pb-24 md:pb-8"}`}>
+      <div className={`w-full flex-1 flex flex-col relative z-10 h-full max-h-full overflow-hidden min-h-0 ${activeTab === "game" ? "pb-14 md:pb-0" : "pb-20 md:pb-6"}`}>
         {/* Inactivity Security Auto-Logout (30 mins) */}
         <AutoLogoutTimer onLogout={handleLogout} timeoutMinutes={30} warningMinutes={2} />
 
@@ -650,8 +651,9 @@ export default function App() {
           tablePlayerCounts={telemetry?.tableActivePlayers}
         />
 
-        {/* Offline Network Status Badge */}
+        {/* Offline Network Status Badge & Diagnostics Heap Monitor */}
         <NetworkStatusBadge lang={lang} />
+        <MemoryMonitor />
 
         {/* Swipe Feedback Toast Notice */}
         <AnimatePresence>
@@ -678,10 +680,10 @@ export default function App() {
               initial={isInitialMount.current ? false : "initial"}
               animate="animate"
               exit="exit"
-              className={`w-full relative ${
+              className={`w-full relative flex-1 h-full min-h-0 overflow-hidden flex flex-col ${
                 activeTab === "game"
-                  ? "max-w-none p-0 overflow-hidden flex flex-col flex-1 h-full min-h-0"
-                  : "max-w-7xl mx-auto px-1 sm:px-4 lg:px-8 py-1.5 sm:py-4 pb-20 md:pb-8"
+                  ? "max-w-none p-0"
+                  : "max-w-7xl mx-auto px-1 sm:px-4 lg:px-8 py-1.5 sm:py-4 pb-20 md:pb-8 overflow-y-auto no-scrollbar"
               }`}
             >
             {activeTab === "game" && (
